@@ -9836,6 +9836,8 @@ async function run() {
       return
     }
 
+    console.log(`Teams assigned as reviewers: ${teams.map(team => team.slug)}`)
+
     // Collect individual members from the assigned teams
     const memberLogins = []
     for (const team of teams) {
