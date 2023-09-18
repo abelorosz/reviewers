@@ -12,6 +12,17 @@ async function run() {
     const { owner, repo, number } = github.context.issue
     console.log(`Owner: ${owner}, Repo: ${repo}, PR Number: ${number}`)
 
+    // Fetch the pull request to get the author's username
+    const { data: pullRequest } = await octokit.pulls.get({
+      owner,
+      repo,
+      pull_number: number
+    })
+
+    const prAuthor = pullRequest.user.login
+
+    console.log(`PR Author: ${prAuthor}`)
+
     // Fetch existing review requests
     const { data: reviewRequests } =
       await octokit.rest.pulls.listRequestedReviewers({
@@ -50,6 +61,13 @@ async function run() {
 
     console.log(`Team members: ${memberLogins}`)
 
+    // Filter out the PR author from the list of potential reviewers
+    const filteredMemberLogins = memberLogins.filter(
+      login => login !== prAuthor
+    )
+
+    console.log(`Filtered team members: ${filteredMemberLogins}`)
+
     // Remove teams from reviewers
     await octokit.rest.pulls.removeRequestedReviewers({
       owner,
@@ -64,7 +82,7 @@ async function run() {
       owner,
       repo,
       pull_number: number,
-      reviewers: memberLogins
+      reviewers: filteredMemberLogins
     })
 
     console.log(
