@@ -13,7 +13,7 @@ async function run() {
     console.log(`Owner: ${owner}, Repo: ${repo}, PR Number: ${number}`)
 
     // Fetch the pull request to get the author's username
-    const { data: pullRequest } = await octokit.pulls.get({
+    const { data: pullRequest } = await octokit.rest.pulls.get({
       owner,
       repo,
       pull_number: number
