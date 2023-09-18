@@ -40,7 +40,7 @@ async function run() {
     console.log(`Teams assigned as reviewers: ${teams.map(team => team.slug)}`)
 
     // Collect individual members from the assigned teams
-    const memberLogins = []
+    const memberLogins = new Set()
     for (const team of teams) {
       console.log(
         `Attempting to fetch members for team slug: ${team.slug} in organization: ${owner}`
@@ -55,18 +55,18 @@ async function run() {
         `Fetched ${teamMembers.length} members for team: ${team.slug}`
       )
 
-      const memberUsernames = teamMembers.map(member => member.login)
-      memberLogins.push(...memberUsernames)
+      for (const member of teamMembers) {
+        memberLogins.add(member.login)
+      }
     }
 
-    console.log(`Team members: ${memberLogins}`)
+    console.log(`Team members: ${Array.from(memberLogins).join(', ')}`)
 
-    // Filter out the PR author from the list of potential reviewers
-    const filteredMemberLogins = memberLogins.filter(
+    // Convert the Set back to an array and filter out the PR author
+    const uniqueMemberLogins = Array.from(memberLogins).filter(
       login => login !== prAuthor
     )
-
-    console.log(`Filtered team members: ${filteredMemberLogins}`)
+    console.log(`Filtered team members: ${uniqueMemberLogins.join(', ')}`)
 
     // Remove teams from reviewers
     await octokit.rest.pulls.removeRequestedReviewers({
@@ -82,11 +82,13 @@ async function run() {
       owner,
       repo,
       pull_number: number,
-      reviewers: filteredMemberLogins
+      reviewers: uniqueMemberLogins
     })
 
     console.log(
-      `Successfully replaced team reviewers with individual team members: ${memberLogins}`
+      `Successfully replaced team reviewers with individual team members: ${uniqueMemberLogins.join(
+        ', '
+      )}`
     )
   } catch (error) {
     core.setFailed(`Action failed with error: ${error}`)
