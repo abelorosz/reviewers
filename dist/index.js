@@ -9848,7 +9848,7 @@ async function run() {
     }
 
     // Remove teams from reviewers
-    await octokit.rest.pulls.deleteReviewRequest({
+    await octokit.rest.pulls.removeRequestedReviewers({
       owner,
       repo,
       pull_number: number,
@@ -9856,7 +9856,7 @@ async function run() {
     })
 
     // Add individual members as reviewers
-    await octokit.rest.pulls.createReviewRequest({
+    await octokit.rest.pulls.requestReviewers({
       owner,
       repo,
       pull_number: number,
