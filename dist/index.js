@@ -9631,14 +9631,6 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 2785:
-/***/ ((module) => {
-
-module.exports = eval("require")("@octokit/rest");
-
-
-/***/ }),
-
 /***/ 2877:
 /***/ ((module) => {
 
@@ -9818,7 +9810,6 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186)
 const github = __nccwpck_require__(5438)
-const { Octokit } = __nccwpck_require__(2785)
 
 async function run() {
   try {
