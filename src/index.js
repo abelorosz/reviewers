@@ -20,7 +20,7 @@ async function run() {
         pull_number: number
       })
 
-    console.log(`ReviewRequests: ${reviewRequests}`)
+    console.log(`ReviewRequests: ${JSON.stringify(reviewRequests)}`)
 
     const teams = reviewRequests.teams
     if (!teams.length) {
