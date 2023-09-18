@@ -34,23 +34,18 @@ async function run() {
       console.log(
         `Attempting to fetch members for team slug: ${team.slug} in organization: ${owner}`
       )
-      try {
-        const { data: teamMembers } = await octokit.rest.teams.listMembersInOrg(
-          {
-            org: owner,
-            team_slug: team.slug
-          }
-        )
-        console.log(
-          `Fetched ${teamMembers.length} members for team: ${team.slug}`
-        )
-        const memberUsernames = teamMembers.map(member => member.login)
-        memberLogins.push(...memberUsernames)
-      } catch (error) {
-        console.log(
-          `Error fetching team members for team ${team.slug}: ${error}`
-        )
-      }
+
+      const { data: teamMembers } = await octokit.rest.teams.listMembersInOrg({
+        org: owner,
+        team_slug: team.slug
+      })
+
+      console.log(
+        `Fetched ${teamMembers.length} members for team: ${team.slug}`
+      )
+
+      const memberUsernames = teamMembers.map(member => member.login)
+      memberLogins.push(...memberUsernames)
     }
 
     console.log(`Team members: ${memberLogins}`)
@@ -60,6 +55,7 @@ async function run() {
       owner,
       repo,
       pull_number: number,
+      reviewers: [],
       team_reviewers: teams.map(team => team.slug)
     })
 
