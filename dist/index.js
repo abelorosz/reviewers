@@ -2722,63 +2722,10 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 713:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const core = __nccwpck_require__(186)
-const { wait } = __nccwpck_require__(312)
-
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
-async function run() {
-  try {
-    const ms = core.getInput('milliseconds', { required: true })
-
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
-
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    // Fail the workflow run if an error occurs
-    core.setFailed(error.message)
-  }
-}
-
-module.exports = {
-  run
-}
-
-
-/***/ }),
-
-/***/ 312:
+/***/ 716:
 /***/ ((module) => {
 
-/**
- * Wait for a number of milliseconds.
- *
- * @param {number} milliseconds The number of milliseconds to wait.
- * @returns {Promise<string>} Resolves with 'done!' after the wait is over.
- */
-async function wait(milliseconds) {
-  return new Promise(resolve => {
-    if (isNaN(milliseconds)) {
-      throw new Error('milliseconds not a number')
-    }
-
-    setTimeout(() => resolve('done!'), milliseconds)
-  })
-}
-
-module.exports = { wait }
+module.exports = eval("require")("@actions/github");
 
 
 /***/ }),
@@ -2912,10 +2859,65 @@ module.exports = require("util");
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-/**
- * The entrypoint for the action.
- */
-const { run } = __nccwpck_require__(713)
+const core = __nccwpck_require__(186)
+const github = __nccwpck_require__(716)
+
+async function run() {
+  try {
+    const token = core.getInput('token', { required: true })
+    const octokit = github.getOctokit(token)
+
+    const { owner, repo, number } = github.context.issue
+
+    // Fetch existing review requests
+    const { data: reviewRequests } = await octokit.pulls.listRequestedReviewers(
+      {
+        owner,
+        repo,
+        pull_number: number
+      }
+    )
+
+    const teams = reviewRequests.teams
+    if (!teams.length) {
+      console.log('No teams are assigned as reviewers.')
+      return
+    }
+
+    // Collect individual members from the assigned teams
+    const memberLogins = []
+    for (const team of teams) {
+      const { data: teamMembers } = await octokit.teams.listMembersInOrg({
+        org: owner,
+        team_slug: team.slug
+      })
+      const memberUsernames = teamMembers.map(member => member.login)
+      memberLogins.push(...memberUsernames)
+    }
+
+    // Remove teams from reviewers
+    await octokit.pulls.deleteReviewRequest({
+      owner,
+      repo,
+      pull_number: number,
+      team_reviewers: teams.map(team => team.slug)
+    })
+
+    // Add individual members as reviewers
+    await octokit.pulls.createReviewRequest({
+      owner,
+      repo,
+      pull_number: number,
+      reviewers: memberLogins
+    })
+
+    console.log(
+      `Successfully replaced team reviewers with individual team members: ${memberLogins}`
+    )
+  } catch (error) {
+    core.setFailed(`Action failed with error: ${error}`)
+  }
+}
 
 run()
 
