@@ -9830,6 +9830,8 @@ async function run() {
         pull_number: number
       })
 
+    console.log(`ReviewRequests: ${reviewRequests}`)
+
     const teams = reviewRequests.teams
     if (!teams.length) {
       console.log('No teams are assigned as reviewers.')
