@@ -29,7 +29,7 @@ async function run() {
     // Collect individual members from the assigned teams
     const memberLogins = []
     for (const team of teams) {
-      const { data: teamMembers } = await octokit.teams.listMembersInOrg({
+      const { data: teamMembers } = await octokit.rest.teams.listMembersInOrg({
         org: owner,
         team_slug: team.slug
       })
@@ -38,7 +38,7 @@ async function run() {
     }
 
     // Remove teams from reviewers
-    await octokit.pulls.deleteReviewRequest({
+    await octokit.rest.pulls.deleteReviewRequest({
       owner,
       repo,
       pull_number: number,
@@ -46,7 +46,7 @@ async function run() {
     })
 
     // Add individual members as reviewers
-    await octokit.pulls.createReviewRequest({
+    await octokit.rest.pulls.createReviewRequest({
       owner,
       repo,
       pull_number: number,
