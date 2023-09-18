@@ -1,12 +1,17 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
+const { Octokit } = require('@octokit/rest')
 
 async function run() {
   try {
     const token = core.getInput('token', { required: true })
+    console.log('Token obtained:', !!token)
+
     const octokit = github.getOctokit(token)
+    console.log('Octokit initialized:', !!octokit)
 
     const { owner, repo, number } = github.context.issue
+    console.log(`Owner: ${owner}, Repo: ${repo}, PR Number: ${number}`)
 
     // Fetch existing review requests
     const { data: reviewRequests } = await octokit.pulls.listRequestedReviewers(

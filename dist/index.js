@@ -9631,6 +9631,14 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 2785:
+/***/ ((module) => {
+
+module.exports = eval("require")("@octokit/rest");
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -9810,13 +9818,18 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186)
 const github = __nccwpck_require__(5438)
+const { Octokit } = __nccwpck_require__(2785)
 
 async function run() {
   try {
     const token = core.getInput('token', { required: true })
+    console.log('Token obtained:', !!token)
+
     const octokit = github.getOctokit(token)
+    console.log('Octokit initialized:', !!octokit)
 
     const { owner, repo, number } = github.context.issue
+    console.log(`Owner: ${owner}, Repo: ${repo}, PR Number: ${number}`)
 
     // Fetch existing review requests
     const { data: reviewRequests } = await octokit.pulls.listRequestedReviewers(
