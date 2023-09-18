@@ -13,13 +13,12 @@ async function run() {
     console.log(`Owner: ${owner}, Repo: ${repo}, PR Number: ${number}`)
 
     // Fetch existing review requests
-    const { data: reviewRequests } = await octokit.pulls.listRequestedReviewers(
-      {
+    const { data: reviewRequests } =
+      await octokit.rest.pulls.listRequestedReviewers({
         owner,
         repo,
         pull_number: number
-      }
-    )
+      })
 
     const teams = reviewRequests.teams
     if (!teams.length) {
