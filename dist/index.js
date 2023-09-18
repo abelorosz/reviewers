@@ -9830,8 +9830,6 @@ async function run() {
         pull_number: number
       })
 
-    console.log(`ReviewRequests: ${JSON.stringify(reviewRequests)}`)
-
     const teams = reviewRequests.teams
     if (!teams.length) {
       console.log('No teams are assigned as reviewers.')
@@ -9848,6 +9846,8 @@ async function run() {
       const memberUsernames = teamMembers.map(member => member.login)
       memberLogins.push(...memberUsernames)
     }
+
+    console.log(`Team members: ${memberLogins}`)
 
     // Remove teams from reviewers
     await octokit.rest.pulls.removeRequestedReviewers({
