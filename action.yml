@@ -1,18 +1,12 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'reviewers'
+description: 'Replace the reviewers of a pull request with a list of users'
+author: '@abelorosz'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  token:
+    description: 'GitHub token'
     required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
 
 runs:
   using: node20
